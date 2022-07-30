@@ -1,4 +1,4 @@
-var APIKey = "23744b8a06001f89b9ea14963a070d6c";
+var APIKey = '23744b8a06001f89b9ea14963a070d6c';
 var citySearch = $('#city-search');
 var searchHistory = JSON.parse(window.localStorage.getItem('localHistory')) || [];
 
@@ -8,6 +8,11 @@ if(searchHistory !== ""){
     displayPastCities();
 }
 
+$('#clearBtn').on('click', function(event) {
+    event.preventDefault();
+    console.log("yo dog");
+})
+
 $('#city-search').on('click', function (event) {
     var city = $('#city-input');
     event.preventDefault();
@@ -15,8 +20,23 @@ $('#city-search').on('click', function (event) {
 
     // save city to local storage
     saveCity(city);
+    weatherAPI(city.val());
 })
 
+function weatherAPI(city){
+    var queryURLWeather = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + APIKey;
+
+    fetch(queryURLWeather, {
+        cache: 'reload',
+    })
+    .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        console.log(data);
+      });
+
+}
 
 function displayPastCities() {
     // access list from local storage
