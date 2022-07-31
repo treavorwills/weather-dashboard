@@ -8,36 +8,54 @@ if(searchHistory !== ""){
     displayPastCities();
 }
 
+// listen for clear history
 $('#clearBtn').on('click', function(event) {
     event.preventDefault();
-    console.log("yo dog");
     removePastCities();
     localStorage.clear();
 })
 
+// listen for city search
 $('#city-search').on('click', function (event) {
     var city = $('#city-input');
     event.preventDefault();
-    // console.log("City input: " + city.val());
-
+    clearAlert();
     // save city to local storage
-    saveCity(city);
     weatherAPI(city.val());
+
 })
 
-function weatherAPI(city){
-    var queryURLWeather = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + APIKey;
+function weatherAPI(cityInput){
+    var queryURLWeather = "http://api.openweathermap.org/data/2.5/weather?q=" + cityInput + "&appid=" + APIKey;
+    console.log(cityInput);
 
     fetch(queryURLWeather, {
         cache: 'reload',
     })
     .then(function (response) {
+        if (response.status !== 200) {
+        console.log('nah dog! ');
+        invalidCity();
+        return;
+        }
+        else {
         return response.json();
+        }
       })
       .then(function (data) {
         console.log(data);
+        saveCity(data.name);
       });
+}
 
+function invalidCity() {
+    console.log('invalidCityCall');
+    $('.alert-info').attr('style', 'display:block');
+}
+
+function clearAlert() {
+    console.log('clearAlertCall');
+    $('.alert-info').attr('style', 'display:none');
 }
 
 function displayPastCities() {
@@ -74,7 +92,7 @@ function saveCity(city) {
     var searchHistory = JSON.parse(window.localStorage.getItem("localHistory")) || [];
     // save the city value in a temporary object
     var cityInput = {
-        cityName: city.val()
+        cityName: city
     };
     // append the city to the array of searched objects
     searchHistory.unshift(cityInput)
@@ -85,9 +103,9 @@ function saveCity(city) {
     var historySection = $('#history-section');
     var button = document.createElement('button');
     button.setAttribute('type', 'button');
-    button.id = city.val();
+    button.id = city;
     button.className = 'btn btn-secondary m-1';
-    button.innerText = city.val();
+    button.innerText = city;
     historySection.prepend(button);
 }
 
