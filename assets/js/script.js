@@ -4,12 +4,12 @@ var searchHistory = JSON.parse(window.localStorage.getItem('localHistory')) || [
 
 
 // display cities saved in local storage
-if(searchHistory !== ""){
+if (searchHistory !== "") {
     displayPastCities();
 }
 
 // listen for clear history
-$('#clearBtn').on('click', function(event) {
+$('#clearBtn').on('click', function (event) {
     event.preventDefault();
     removePastCities();
     localStorage.clear();
@@ -25,27 +25,27 @@ $('#city-search').on('click', function (event) {
 
 })
 
-function weatherAPI(cityInput){
+function weatherAPI(cityInput) {
     var queryURLWeather = "http://api.openweathermap.org/data/2.5/weather?q=" + cityInput + "&appid=" + APIKey;
     console.log(cityInput);
 
     fetch(queryURLWeather, {
         cache: 'reload',
     })
-    .then(function (response) {
-        if (response.status !== 200) {
-        console.log('nah dog! ');
-        invalidCity();
-        return;
-        }
-        else {
-        return response.json();
-        }
-      })
-      .then(function (data) {
-        console.log(data);
-        saveCity(data.name);
-      });
+        .then(function (response) {
+            if (response.status !== 200) {
+                console.log('nah dog! ');
+                invalidCity();
+                return;
+            }
+            else {
+                return response.json();
+            }
+        })
+        .then(function (data) {
+            console.log(data);
+            saveCity(data.name);
+        });
 }
 
 function invalidCity() {
