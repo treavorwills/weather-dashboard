@@ -23,10 +23,11 @@ $('#city-search').on('click', function (event) {
     // save city to local storage
     weatherAPI(city.val());
 
+
 })
 
 function weatherAPI(cityInput) {
-    var queryURLWeather = "http://api.openweathermap.org/data/2.5/weather?q=" + cityInput + "&appid=" + APIKey;
+    var queryURLWeather = "http://api.openweathermap.org/data/2.5/weather?q=" + cityInput + "&units=imperial&appid=" + APIKey;
     console.log(cityInput);
 
     fetch(queryURLWeather, {
@@ -39,13 +40,60 @@ function weatherAPI(cityInput) {
                 return;
             }
             else {
+                $('#weather-forecast-section').attr('style', 'display:block');
                 return response.json();
             }
         })
         .then(function (data) {
             console.log(data);
             saveCity(data.name);
+            weatherOneCall(data.coord.lat, data.coord.lon, data.name);
         });
+}
+
+function weatherOneCall(lat, lon, name) {
+    console.log(lat + ' ' + lon);
+    var queryURLWeatherOneCall = 'https://api.openweathermap.org/data/2.5/onecall?lat=' + lat + '&lon=' + lon + '&exclude=minutely,hourly&units=imperial&appid=' + APIKey;
+
+    fetch(queryURLWeatherOneCall, {
+        cache: 'reload',
+    })
+    .then(function (response) {
+        if (response.status !== 200) {
+            console.log('OneCall 3.0 issue');
+            return;
+        }
+        else {
+            return response.json();
+        }
+    })
+    .then(function(data){
+        console.log('One call data: ');
+        console.log(data);
+        displayWeather(data, name);
+    })
+}
+
+function displayWeather(data, name) {
+    // Today's Weather - Jumbotron
+    var temp = data.current.temp;
+    var wind = data.current.wind_speed;
+    var icon = data.current.weather[0].icon;
+    var uvi = data.current.uvi;
+    $('#city-date-icon').text(name + ' ' + icon);
+    $('#current-temp').text('Temp: ' + temp.toPrecision(4) + ' \u00B0');
+    $('#current-wind').text('Wind: ' + wind + " mph");
+    $('#current-humidity').text('Humidity: ' + data.current.humidity + '%');
+    $('#current-uv').text('UV Index: ' + uvi);
+
+    for (var i=0; i<5; i++) {
+        var icon = data.daily[i].weather[0].icon;
+        $('#card-temp-' + i).text('Temp: ' + data.daily[i].temp.max + ' \u00B0');
+        $('#card-icon-' + i).text(icon);
+        $('#card-wind-' + i).text('Wind: ' + data.daily[i].wind_speed + ' mph');
+        $('#card-humidity-' + i).text('Humidity: ' + data.daily[i].humidity + '%');
+
+    }
 }
 
 function invalidCity() {
@@ -108,4 +156,6 @@ function saveCity(city) {
     button.innerText = city;
     historySection.prepend(button);
 }
+
+
 
