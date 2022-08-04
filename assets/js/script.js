@@ -46,7 +46,7 @@ function weatherAPI(cityInput) {
         })
         .then(function (data) {
             console.log(data);
-            saveCity(data.name);
+            saveCity(data.name.replace('.','').replace(/[^a-zA-Z0-9]/g, '-'));
             weatherOneCall(data.coord.lat, data.coord.lon, data.name);
         });
 }
@@ -82,7 +82,7 @@ function displayWeather(data, name) {
     var uvi = data.current.uvi;
     var imgEl = getImgEl(iconCode);
     var cityDateIcon = $('#city-date-icon');
-    cityDateIcon.text(name + ' ' + moment().format('M.D.YY'));
+    cityDateIcon.text(name + ' ' + '(' + moment().format('M.D.YY') + ')');
     cityDateIcon.append(imgEl);
     $('#current-temp').text('Temp: ' + temp.toPrecision(4) + ' \u00B0');
     $('#current-wind').text('Wind: ' + wind + " mph");
@@ -91,9 +91,10 @@ function displayWeather(data, name) {
 
     for (var i=0; i<5; i++) {
         var iconCode = data.daily[i].weather[0].icon;
-        $('#card-title-' + i).text(moment().add(i+0, 'days').format('ddd M/D'))
+        $('#card-title-' + i).text(moment().add(i+0, 'days').format('ddd (M.D)'))
         $('#card-temp-' + i).text('Temp: ' + data.daily[i].temp.max + ' \u00B0');
         var imgEl = getImgEl(iconCode);
+        $('#card-icon-' + i).text('');
         $('#card-icon-' + i).append(imgEl);
         $('#card-wind-' + i).text('Wind: ' + data.daily[i].wind_speed + ' mph');
         $('#card-humidity-' + i).text('Humidity: ' + data.daily[i].humidity + '%');
@@ -164,7 +165,7 @@ function saveCity(city) {
     button.setAttribute('type', 'button');
     button.id = city;
     button.className = 'btn btn-secondary m-1';
-    button.innerText = city;
+    button.innerText = city.replace('-', ' ');
     historySection.prepend(button);
 }
 
