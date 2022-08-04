@@ -78,9 +78,14 @@ function displayWeather(data, name) {
     // Today's Weather - Jumbotron
     var temp = data.current.temp;
     var wind = data.current.wind_speed;
-    var icon = data.current.weather[0].icon;
+    var iconCode = data.current.weather[0].icon;
     var uvi = data.current.uvi;
-    $('#city-date-icon').text(name + ' ' + icon);
+    var imgEl = $('<img />');
+    var imgURL = 'https://openweathermap.org/img/wn/' + iconCode + '@2x.png';
+    imgEl.attr('src',imgURL);
+    var cityDateIcon = $('#city-date-icon');
+    cityDateIcon.text(name + ' ');
+    cityDateIcon.append(imgEl);
     $('#current-temp').text('Temp: ' + temp.toPrecision(4) + ' \u00B0');
     $('#current-wind').text('Wind: ' + wind + " mph");
     $('#current-humidity').text('Humidity: ' + data.current.humidity + '%');
@@ -92,7 +97,6 @@ function displayWeather(data, name) {
         $('#card-icon-' + i).text(icon);
         $('#card-wind-' + i).text('Wind: ' + data.daily[i].wind_speed + ' mph');
         $('#card-humidity-' + i).text('Humidity: ' + data.daily[i].humidity + '%');
-
     }
 }
 
