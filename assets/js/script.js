@@ -22,13 +22,11 @@ $('#city-search').on('click', function (event) {
     clearAlert();
     // save city to local storage
     weatherAPI(city.val());
-
-
 })
 
 function weatherAPI(cityInput) {
     var queryURLWeather = "https://api.openweathermap.org/data/2.5/weather?q=" + cityInput + "&units=imperial&appid=" + APIKey;
-    console.log(cityInput);
+    // console.log(cityInput);
 
     fetch(queryURLWeather, {
         cache: 'reload',
@@ -46,7 +44,7 @@ function weatherAPI(cityInput) {
         })
         .then(function (data) {
             console.log(data);
-            saveCity(data.name.replace('.','').replace(/[^a-zA-Z0-9]/g, '-'));
+            saveCity(data.name.replace('.', '').replace(/[^a-zA-Z0-9]/g, '-'));
             weatherOneCall(data.coord.lat, data.coord.lon, data.name);
         });
 }
@@ -58,20 +56,20 @@ function weatherOneCall(lat, lon, name) {
     fetch(queryURLWeatherOneCall, {
         cache: 'reload',
     })
-    .then(function (response) {
-        if (response.status !== 200) {
-            console.log('OneCall 3.0 issue');
-            return;
-        }
-        else {
-            return response.json();
-        }
-    })
-    .then(function(data){
-        console.log('One call data: ');
-        console.log(data);
-        displayWeather(data, name);
-    })
+        .then(function (response) {
+            if (response.status !== 200) {
+                console.log('OneCall 3.0 issue');
+                return;
+            }
+            else {
+                return response.json();
+            }
+        })
+        .then(function (data) {
+            console.log('One call data: ');
+            console.log(data);
+            displayWeather(data, name);
+        })
 }
 
 function displayWeather(data, name) {
@@ -89,9 +87,9 @@ function displayWeather(data, name) {
     $('#current-humidity').text('Humidity: ' + data.current.humidity + '%');
     $('#current-uv').text('UV Index: ' + uvi);
 
-    for (var i=0; i<5; i++) {
+    for (var i = 0; i < 5; i++) {
         var iconCode = data.daily[i].weather[0].icon;
-        $('#card-title-' + i).text(moment().add(i+0, 'days').format('ddd (M.D)'))
+        $('#card-title-' + i).text(moment().add(i + 0, 'days').format('ddd (M.D)'))
         $('#card-temp-' + i).text('Temp: ' + data.daily[i].temp.max + ' \u00B0');
         var imgEl = getImgEl(iconCode);
         $('#card-icon-' + i).text('');
@@ -104,7 +102,7 @@ function displayWeather(data, name) {
 function getImgEl(iconCode) {
     var imgEl = $('<img />');
     var imgURL = 'https://openweathermap.org/img/wn/' + iconCode + '@2x.png';
-    imgEl.attr('src',imgURL);
+    imgEl.attr('src', imgURL);
     return imgEl;
 }
 
@@ -155,7 +153,8 @@ function saveCity(city) {
         cityName: city
     };
     // append the city to the array of searched objects
-    searchHistory.unshift(cityInput)
+    searchHistory.unshift(cityInput);
+
     // console.log(searchHistory);
     // save the updated search array of objects to local storage
     window.localStorage.setItem("localHistory", JSON.stringify(searchHistory));
