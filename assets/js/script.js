@@ -80,11 +80,9 @@ function displayWeather(data, name) {
     var wind = data.current.wind_speed;
     var iconCode = data.current.weather[0].icon;
     var uvi = data.current.uvi;
-    var imgEl = $('<img />');
-    var imgURL = 'https://openweathermap.org/img/wn/' + iconCode + '@2x.png';
-    imgEl.attr('src',imgURL);
+    var imgEl = getImgEl(iconCode);
     var cityDateIcon = $('#city-date-icon');
-    cityDateIcon.text(name + ' ');
+    cityDateIcon.text(name + ' ' + moment().format('M.D.YY'));
     cityDateIcon.append(imgEl);
     $('#current-temp').text('Temp: ' + temp.toPrecision(4) + ' \u00B0');
     $('#current-wind').text('Wind: ' + wind + " mph");
@@ -92,12 +90,21 @@ function displayWeather(data, name) {
     $('#current-uv').text('UV Index: ' + uvi);
 
     for (var i=0; i<5; i++) {
-        var icon = data.daily[i].weather[0].icon;
+        var iconCode = data.daily[i].weather[0].icon;
+        $('#card-title-' + i).text(moment().add(i+0, 'days').format('ddd M/D'))
         $('#card-temp-' + i).text('Temp: ' + data.daily[i].temp.max + ' \u00B0');
-        $('#card-icon-' + i).text(icon);
+        var imgEl = getImgEl(iconCode);
+        $('#card-icon-' + i).append(imgEl);
         $('#card-wind-' + i).text('Wind: ' + data.daily[i].wind_speed + ' mph');
         $('#card-humidity-' + i).text('Humidity: ' + data.daily[i].humidity + '%');
     }
+}
+
+function getImgEl(iconCode) {
+    var imgEl = $('<img />');
+    var imgURL = 'https://openweathermap.org/img/wn/' + iconCode + '@2x.png';
+    imgEl.attr('src',imgURL);
+    return imgEl;
 }
 
 function invalidCity() {
