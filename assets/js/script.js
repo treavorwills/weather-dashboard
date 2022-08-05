@@ -11,6 +11,7 @@ if (searchHistory !== "") {
 // listen for clear history
 $('#clearBtn').on('click', function (event) {
     event.preventDefault();
+    console.log('inside listener for clear button');
     removePastCities();
     localStorage.clear();
 })
@@ -22,6 +23,12 @@ $('#city-search').on('click', function (event) {
     clearAlert();
     // save city to local storage
     weatherAPI(city.val());
+})
+
+$('.btn-secondary').on('click', function (event) {
+    var cityID = this.id;
+    console.log("city button");
+    weatherAPI(cityID);
 })
 
 function weatherAPI(cityInput) {
@@ -44,7 +51,6 @@ function weatherAPI(cityInput) {
         })
         .then(function (data) {
             console.log(data);
-            saveCity(data.name.replace('.', '').replace(/[^a-zA-Z0-9]/g, '-'));
             weatherOneCall(data.coord.lat, data.coord.lon, data.name);
         });
 }
@@ -69,6 +75,7 @@ function weatherOneCall(lat, lon, name) {
             console.log('One call data: ');
             console.log(data);
             displayWeather(data, name);
+            saveCity(data, name);
         })
 }
 
@@ -117,8 +124,19 @@ function clearAlert() {
 }
 
 function displayPastCities() {
+    removePastCities();
     // access list from local storage
     var searchHistory = JSON.parse(window.localStorage.getItem('localHistory')) || [];
+
+    if (searchHistory.length > 0) {
+        var historySection = $('#history-section');
+        var clearButton = document.createElement('button');
+        clearButton.setAttribute('type', 'button');
+        clearButton.id = 'clearBtn';
+        clearButton.className = 'btn btn-warning m-1';
+        clearButton.innerText = 'Clear History';
+        historySection.append(clearButton);
+    }
     // set variable for the history-section
     var historySection = $('#history-section');
     // append to history section
@@ -131,41 +149,75 @@ function displayPastCities() {
         button.innerText = item.cityName;
         historySection.prepend(button);
     });
+
+    $('#clearBtn').on('click', function (event) {
+        event.preventDefault();
+        console.log('inside listener for clear button');
+        removePastCities();
+        localStorage.clear();
+    })
+
+    $('.btn-secondary').on('click', function (event) {
+        var cityID = this.id;
+        console.log("city button");
+        weatherAPI(cityID);
+    })
 }
 
 function removePastCities() {
-    // access list from local storage
-    var searchHistory = JSON.parse(window.localStorage.getItem('localHistory')) || [];
-    // set variable for the history-section
+    // // access list from local storage
+    // var searchHistory = JSON.parse(window.localStorage.getItem('localHistory')) || [];
+    // // set variable for the history-section
+    // var historySection = $('#history-section');
+    // // remove each local storage item from the history section
+    // searchHistory.forEach(function (item, index) {
+    //     var button = $('#' + item.cityName);
+    //     button.remove();
+    // });
+    console.log('inside remove past cities');
     var historySection = $('#history-section');
-    // remove each local storage item from the history section
-    searchHistory.forEach(function (item, index) {
-        var button = $('#' + item.cityName);
-        button.remove();
-    });
+    historySection.append('hello');
+    historySection.empty();
 }
 
-function saveCity(city) {
+function saveCity(data, city) {
     // pull from local storage or empty array
     var searchHistory = JSON.parse(window.localStorage.getItem("localHistory")) || [];
     // save the city value in a temporary object
     var cityInput = {
-        cityName: city
+        cityName: city,
+        cityWeatherData: data
     };
-    // append the city to the array of searched objects
+
+    // set found to false
+    var found = false;
+    // check to see if city is already in local storage
+    for(var i = 0; i < searchHistory.length; i++) {
+        if (searchHistory[i].cityName === cityInput.cityName) {
+           found = true;
+           break;
+      }
+    }
+    console.log(found);
+    if (!found) {
     searchHistory.unshift(cityInput);
+    }
+    
+    console.log(searchHistory);
+    // append the city to the array of searched objects
 
     // console.log(searchHistory);
     // save the updated search array of objects to local storage
     window.localStorage.setItem("localHistory", JSON.stringify(searchHistory));
 
-    var historySection = $('#history-section');
-    var button = document.createElement('button');
-    button.setAttribute('type', 'button');
-    button.id = city;
-    button.className = 'btn btn-secondary m-1';
-    button.innerText = city.replace('-', ' ');
-    historySection.prepend(button);
+    displayPastCities();
+    // var historySection = $('#history-section');
+    // var button = document.createElement('button');
+    // button.setAttribute('type', 'button');
+    // button.id = city;
+    // button.className = 'btn btn-secondary m-1';
+    // button.innerText = city.replace('-', ' ');
+    // historySection.prepend(button);
 }
 
 
